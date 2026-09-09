@@ -39,6 +39,11 @@ class AppContainer(context: Context) {
     }
 
     private suspend fun seedIfNeeded() {
+        // Phase 1 called this unconditionally, which reset technician
+        // availability toggles and demo job data on every launch. Phase 2
+        // requires real persistence across restarts, so this now only seeds
+        // once, on a genuinely empty database.
+        if (database.serviceCategoryDao().count() > 0) return
         database.serviceCategoryDao().insertAll(SeedData.categories())
         database.customerDao().insertAll(SeedData.customers())
         database.technicianDao().insertAll(SeedData.technicians())

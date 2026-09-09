@@ -28,6 +28,21 @@ sealed class CustomerTab(val route: String, val label: String, val icon: ImageVe
     object Profile : CustomerTab("customer/profile", "Profile", Icons.Filled.Person)
 }
 
+/**
+ * Phase 2 destinations layered on top of the Phase 1 bottom-nav tabs above.
+ * These live inside the same customer NavHost (see CustomerRootScreen) but are
+ * not tabs themselves — the bottom bar is hidden while on them.
+ */
+object CustomerRoutes {
+    private const val CREATE_REQUEST_BASE = "customer/create_request"
+    const val CREATE_REQUEST = "$CREATE_REQUEST_BASE/{serviceId}"
+    fun createRequest(serviceId: String) = "$CREATE_REQUEST_BASE/$serviceId"
+
+    private const val JOB_DETAILS_BASE = "customer/job_details"
+    const val JOB_DETAILS = "$JOB_DETAILS_BASE/{jobId}"
+    fun jobDetails(jobId: String) = "$JOB_DETAILS_BASE/$jobId"
+}
+
 sealed class TechnicianTab(val route: String, val label: String, val icon: ImageVector) {
     object Home : TechnicianTab("technician/home", "Home", Icons.Filled.Home)
     object JobRequests : TechnicianTab("technician/job_requests", "Job Requests", Icons.Filled.List)
@@ -42,4 +57,3 @@ sealed class AdminTab(val route: String, val label: String, val icon: ImageVecto
     object Services : AdminTab("admin/services", "Services", Icons.Filled.Place)
     object Areas : AdminTab("admin/areas", "Areas", Icons.Filled.LocationOn)
 }
-

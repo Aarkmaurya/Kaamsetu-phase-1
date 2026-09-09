@@ -31,18 +31,28 @@ data class CustomerEntity(
     val phone: String
 )
 
+/**
+ * Phase 2: expanded to match the full JobRequest domain model (service name,
+ * scheduling, service type, customer name, createdAt). Room version was bumped
+ * in KaamSetuDatabase along with this change; fallbackToDestructiveMigration()
+ * is still in place for the MVP so this does not require a Migration class.
+ */
 @Entity(tableName = "job_requests")
 data class JobRequestEntity(
     @PrimaryKey val id: String,
     val customerId: String,
-    val categoryId: String,
+    val serviceId: String,
+    val serviceName: String,
     val problemDescription: String,
+    val preferredTime: String,
+    val scheduledDateTime: String? = null,
+    val serviceType: String,
     val approximateArea: String,
-    val timing: String,
-    val preferredDateTime: String,
-    val status: String,
+    val exactAddress: String? = null,
+    val customerName: String,
     val customerPhone: String,
-    val exactAddress: String,
+    val status: String,
+    val createdAt: Long,
     val selectedTechnicianId: String? = null
 )
 
@@ -54,3 +64,4 @@ data class QuoteEntity(
     val price: Double,
     val etaMinutes: Int
 )
+

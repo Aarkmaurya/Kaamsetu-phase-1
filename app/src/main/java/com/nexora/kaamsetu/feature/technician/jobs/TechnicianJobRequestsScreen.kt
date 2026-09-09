@@ -26,6 +26,7 @@ import com.nexora.kaamsetu.core.di.LocalAppContainer
 import com.nexora.kaamsetu.core.theme.InfoCard
 import com.nexora.kaamsetu.core.theme.ScreenTitle
 import com.nexora.kaamsetu.domain.model.JobRequestPublicView
+import com.nexora.kaamsetu.domain.model.timingDisplay
 
 @Composable
 fun TechnicianJobRequestsScreen() {
@@ -71,14 +72,10 @@ private fun JobRequestCard(
     var quoteSent by remember { mutableStateOf(false) }
 
     InfoCard {
-        Text(text = request.problemDescription, style = MaterialTheme.typography.titleMedium)
+        Text(text = request.serviceName, style = MaterialTheme.typography.titleMedium)
+        Text(text = request.problemDescription, style = MaterialTheme.typography.bodyMedium)
         Text(
-            text = "${request.approximateArea} • ${request.timing.name}",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = "Requested: ${request.preferredDateTime}",
+            text = "${request.approximateArea} • ${request.timingDisplay()}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

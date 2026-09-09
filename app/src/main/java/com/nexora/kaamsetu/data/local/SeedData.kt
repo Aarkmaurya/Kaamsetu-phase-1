@@ -13,6 +13,8 @@ object SeedData {
         ServiceCategoryEntity("painter", "Home Repair", "Painter"),
         ServiceCategoryEntity("mason", "Home Repair", "Mason"),
         ServiceCategoryEntity("welder", "Home Repair", "Welder"),
+        ServiceCategoryEntity("locksmith", "Home Repair", "Locksmith"),
+        ServiceCategoryEntity("gardener", "Home Repair", "Gardener"),
         ServiceCategoryEntity("ac_repair", "Appliance Repair", "AC Repair"),
         ServiceCategoryEntity("cooler_repair", "Appliance Repair", "Cooler Repair"),
         ServiceCategoryEntity("fridge_repair", "Appliance Repair", "Refrigerator Repair"),
@@ -21,10 +23,13 @@ object SeedData {
         ServiceCategoryEntity("tv_repair", "Appliance Repair", "TV Repair"),
         ServiceCategoryEntity("mobile_repair", "Technology", "Mobile Repair"),
         ServiceCategoryEntity("computer_repair", "Technology", "Computer Repair"),
-        ServiceCategoryEntity("wifi_setup", "Technology", "Wi-Fi Setup"),
+        // Phase 1 ids kept as-is (technician skills reference them); display
+        // names updated in Phase 2 to match the product's demo service list.
+        ServiceCategoryEntity("wifi_setup", "Technology", "Wi-Fi Technician"),
         ServiceCategoryEntity("printer_repair", "Technology", "Printer Repair"),
-        ServiceCategoryEntity("cctv_install", "Technology", "CCTV Installation"),
+        ServiceCategoryEntity("cctv_install", "Technology", "CCTV Technician"),
         ServiceCategoryEntity("home_cleaning", "Cleaning", "Home Cleaning"),
+        ServiceCategoryEntity("cleaner", "Cleaning", "Cleaner"),
         ServiceCategoryEntity("bathroom_cleaning", "Cleaning", "Bathroom Cleaning"),
         ServiceCategoryEntity("sofa_cleaning", "Cleaning", "Sofa Cleaning"),
         ServiceCategoryEntity("water_tank_cleaning", "Cleaning", "Water Tank Cleaning"),
@@ -59,30 +64,44 @@ object SeedData {
         CustomerEntity(id = "cust_demo", name = "Demo Customer", phone = "9998887770")
     )
 
+    /**
+     * A couple of illustrative jobs so My Jobs / Admin Jobs aren't empty on
+     * first launch. Phase 2's real flow is creating NEW requests through the
+     * app itself (Home -> Services -> Create Request) — this seed data is not
+     * regenerated on every launch beyond the initial insert.
+     */
     fun jobRequests(): List<JobRequestEntity> = listOf(
         JobRequestEntity(
             id = "job_1",
             customerId = "cust_demo",
-            categoryId = "electrician",
+            serviceId = "electrician",
+            serviceName = "Electrician",
             problemDescription = "Ceiling fan not switching on, possible wiring issue.",
+            preferredTime = "TODAY",
+            scheduledDateTime = null,
+            serviceType = "HOME_VISIT",
             approximateArea = "Gomti Nagar, Lucknow",
-            timing = "TODAY",
-            preferredDateTime = "Today, evening",
-            status = "QUOTES_RECEIVED",
+            exactAddress = "House 12, Sector 4, Gomti Nagar, Lucknow",
+            customerName = "Demo Customer",
             customerPhone = "9998887770",
-            exactAddress = "House 12, Sector 4, Gomti Nagar, Lucknow"
+            status = "QUOTES_RECEIVED",
+            createdAt = System.currentTimeMillis() - 3_600_000L
         ),
         JobRequestEntity(
             id = "job_2",
             customerId = "cust_demo",
-            categoryId = "plumber",
+            serviceId = "plumber",
+            serviceName = "Plumber",
             problemDescription = "Kitchen tap leaking continuously.",
+            preferredTime = "NOW",
+            scheduledDateTime = null,
+            serviceType = "HOME_VISIT",
             approximateArea = "Indira Nagar, Lucknow",
-            timing = "NOW",
-            preferredDateTime = "As soon as possible",
-            status = "REQUEST_CREATED",
+            exactAddress = "Flat 302, Shanti Apartments, Indira Nagar, Lucknow",
+            customerName = "Demo Customer",
             customerPhone = "9998887770",
-            exactAddress = "Flat 302, Shanti Apartments, Indira Nagar, Lucknow"
+            status = "REQUEST_CREATED",
+            createdAt = System.currentTimeMillis() - 1_800_000L
         )
     )
 

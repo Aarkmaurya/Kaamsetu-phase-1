@@ -36,7 +36,8 @@ fun AdminJobsScreen() {
 
         items(jobs) { job ->
             InfoCard {
-                Text(text = job.problemDescription, style = MaterialTheme.typography.titleMedium)
+                Text(text = job.serviceName, style = MaterialTheme.typography.titleMedium)
+                Text(text = job.problemDescription, style = MaterialTheme.typography.bodyMedium)
                 Text(
                     text = job.approximateArea,
                     style = MaterialTheme.typography.bodyMedium,
@@ -52,4 +53,3 @@ fun AdminJobsScreen() {
         }
     }
 }
-

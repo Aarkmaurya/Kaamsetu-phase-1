@@ -12,6 +12,9 @@ interface ServiceCategoryDao {
     @Query("SELECT * FROM service_categories ORDER BY `group`, name")
     fun observeAll(): Flow<List<ServiceCategoryEntity>>
 
+    @Query("SELECT COUNT(*) FROM service_categories")
+    suspend fun count(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(categories: List<ServiceCategoryEntity>)
 }
@@ -45,16 +48,20 @@ interface CustomerDao {
 
 @Dao
 interface JobRequestDao {
-    @Query("SELECT * FROM job_requests ORDER BY id DESC")
+    @Query("SELECT * FROM job_requests ORDER BY createdAt DESC")
     fun observeAll(): Flow<List<JobRequestEntity>>
 
-    @Query("SELECT * FROM job_requests WHERE customerId = :customerId ORDER BY id DESC")
+    @Query("SELECT * FROM job_requests WHERE customerId = :customerId ORDER BY createdAt DESC")
     fun observeForCustomer(customerId: String): Flow<List<JobRequestEntity>>
 
-    @Query("SELECT * FROM job_requests WHERE status IN ('REQUEST_CREATED', 'QUOTES_RECEIVED')")
+    /** Used by the customer Job Details screen — reactive so a cancel() updates the screen in place. */
+    @Query("SELECT * FROM job_requests WHERE id = :id LIMIT 1")
+    fun observeById(id: String): Flow<JobRequestEntity?>
+
+    @Query("SELECT * FROM job_requests WHERE status IN ('REQUEST_CREATED', 'FINDING_PROFESSIONALS', 'QUOTES_RECEIVED')")
     fun observeOpenRequests(): Flow<List<JobRequestEntity>>
 
-    @Query("SELECT * FROM job_requests WHERE selectedTechnicianId = :technicianId ORDER BY id DESC")
+    @Query("SELECT * FROM job_requests WHERE selectedTechnicianId = :technicianId ORDER BY createdAt DESC")
     fun observeForSelectedTechnician(technicianId: String): Flow<List<JobRequestEntity>>
 
     @Query("SELECT * FROM job_requests WHERE id = :id")
@@ -78,4 +85,3 @@ interface QuoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(quotes: List<QuoteEntity>)
 }
-

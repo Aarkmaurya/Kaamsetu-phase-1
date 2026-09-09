@@ -13,6 +13,8 @@ import com.nexora.kaamsetu.domain.model.JobRequestPublicView
 import com.nexora.kaamsetu.domain.model.JobStatus
 import com.nexora.kaamsetu.domain.model.Quote
 import com.nexora.kaamsetu.domain.model.ServiceCategory
+import com.nexora.kaamsetu.domain.model.ServiceType
+import com.nexora.kaamsetu.domain.model.ServiceTiming
 import com.nexora.kaamsetu.domain.model.Technician
 import com.nexora.kaamsetu.domain.model.TechnicianStatus
 import kotlinx.coroutines.flow.Flow
@@ -76,6 +78,9 @@ class MockJobRepository(
     override fun observeAllJobs(): Flow<List<JobRequest>> =
         jobDao.observeAll().map { list -> list.map { it.toDomain() } }
 
+    override fun observeJobById(jobRequestId: String): Flow<JobRequest?> =
+        jobDao.observeById(jobRequestId).map { it?.toDomain() }
+
     override fun observeOpenRequestsPublicView(): Flow<List<JobRequestPublicView>> =
         jobDao.observeOpenRequests().map { list -> list.map { it.toDomain().publicView() } }
 
@@ -119,28 +124,36 @@ class MockJobRepository(
     private fun JobRequestEntity.toDomain() = JobRequest(
         id = id,
         customerId = customerId,
-        categoryId = categoryId,
+        serviceId = serviceId,
+        serviceName = serviceName,
         problemDescription = problemDescription,
+        preferredTime = ServiceTiming.valueOf(preferredTime),
+        scheduledDateTime = scheduledDateTime,
+        serviceType = ServiceType.valueOf(serviceType),
         approximateArea = approximateArea,
-        timing = com.nexora.kaamsetu.domain.model.ServiceTiming.valueOf(timing),
-        preferredDateTime = preferredDateTime,
-        status = JobStatus.valueOf(status),
-        customerPhone = customerPhone,
         exactAddress = exactAddress,
+        customerName = customerName,
+        customerPhone = customerPhone,
+        status = JobStatus.valueOf(status),
+        createdAt = createdAt,
         selectedTechnicianId = selectedTechnicianId
     )
 
     private fun JobRequest.toEntity() = JobRequestEntity(
         id = id,
         customerId = customerId,
-        categoryId = categoryId,
+        serviceId = serviceId,
+        serviceName = serviceName,
         problemDescription = problemDescription,
+        preferredTime = preferredTime.name,
+        scheduledDateTime = scheduledDateTime,
+        serviceType = serviceType.name,
         approximateArea = approximateArea,
-        timing = timing.name,
-        preferredDateTime = preferredDateTime,
-        status = status.name,
-        customerPhone = customerPhone,
         exactAddress = exactAddress,
+        customerName = customerName,
+        customerPhone = customerPhone,
+        status = status.name,
+        createdAt = createdAt,
         selectedTechnicianId = selectedTechnicianId
     )
 }

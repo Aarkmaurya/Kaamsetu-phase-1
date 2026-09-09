@@ -45,9 +45,14 @@ fun TechnicianActiveJobsScreen() {
         items(activeJobs) { job ->
             InfoCard {
                 Column {
-                    Text(text = job.problemDescription, style = MaterialTheme.typography.titleMedium)
+                    Text(text = job.serviceName, style = MaterialTheme.typography.titleMedium)
+                    Text(text = job.problemDescription, style = MaterialTheme.typography.bodyMedium)
                     Text(
-                        text = "Address: ${job.exactAddress}",
+                        text = "Customer: ${job.customerName}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Address: ${job.exactAddress ?: "Visit Service Center"}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(

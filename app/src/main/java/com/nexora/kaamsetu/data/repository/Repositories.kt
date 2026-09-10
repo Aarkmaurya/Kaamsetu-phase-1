@@ -37,6 +37,18 @@ interface JobRepository {
     fun observeJobById(jobRequestId: String): Flow<JobRequest?>
 
     /**
+     * Privacy-safe single-job lookup for a technician's Job Details screen —
+     * the SAME guarantee as observeOpenRequestsPublicView(): the return type
+     * itself cannot carry phone/exact address/customer name, so there is no
+     * code path here that can leak them, regardless of the job's status.
+     *
+     * BACKEND TODO: the server-side equivalent must be served from a
+     * technician-facing endpoint/query that strips private fields at the data
+     * layer — never the same endpoint the owning customer uses.
+     */
+    fun observeOpenJobPublicViewById(jobRequestId: String): Flow<JobRequestPublicView?>
+
+    /**
      * Privacy-safe view for technicians who have NOT been selected yet.
      * This is the enforcement point for "no phone/address before selection".
      *
@@ -56,6 +68,20 @@ interface JobRepository {
     fun observeJobsForSelectedTechnician(technicianId: String): Flow<List<JobRequest>>
 
     suspend fun createJobRequest(request: JobRequest)
+
+    /**
+     * Assigns exactly one technician to a job and unlocks private customer
+     * data to them (see JobRequest's class doc). Also marks the winning
+     * quote SELECTED and every other quote on this job NOT_SELECTED.
+     *
+     * SAFETY: if the job already has a selectedTechnicianId, this is a no-op —
+     * a job can only ever be assigned once, enforced here regardless of what
+     * the UI allows the customer to tap.
+     *
+     * BACKEND TODO: this must be a single atomic server-side transaction
+     * (assign + lock quotes) guarded by the same "already assigned?" check,
+     * re-validated against the database, not client state.
+     */
     suspend fun selectTechnician(jobRequestId: String, technicianId: String)
 
     /**
@@ -68,6 +94,19 @@ interface JobRepository {
     suspend fun updateStatus(jobRequestId: String, status: JobStatus)
 
     fun observeQuotesForJob(jobRequestId: String): Flow<List<Quote>>
+
+    /** Used to prefill Send/Update Quote and to decide which label to show. */
+    suspend fun getMyQuoteForJob(jobRequestId: String, technicianId: String): Quote?
+
+    /**
+     * Creates a new quote, OR updates this technician's existing quote for
+     * this job if one already exists — enforced by (jobRequestId, technicianId)
+     * lookup inside the implementation, not by trusting the id the caller
+     * passes in. This is what prevents duplicate quote records.
+     *
+     * Also advances job status from REQUEST_CREATED/FINDING_PROFESSIONALS to
+     * QUOTES_RECEIVED on the first quote for a job.
+     */
     suspend fun submitQuote(quote: Quote)
 }
 

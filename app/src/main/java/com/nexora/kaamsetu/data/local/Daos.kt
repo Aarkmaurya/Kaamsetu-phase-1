@@ -76,12 +76,24 @@ interface JobRequestDao {
 
 @Dao
 interface QuoteDao {
-    @Query("SELECT * FROM quotes WHERE jobRequestId = :jobRequestId")
+    @Query("SELECT * FROM quotes WHERE jobRequestId = :jobRequestId ORDER BY createdAt DESC")
     fun observeForJob(jobRequestId: String): Flow<List<QuoteEntity>>
 
+    /** Used to enforce "one active quote per technician per job" — see JobRepository.submitQuote. */
+    @Query("SELECT * FROM quotes WHERE jobRequestId = :jobRequestId AND technicianId = :technicianId LIMIT 1")
+    suspend fun getByJobAndTechnician(jobRequestId: String, technicianId: String): QuoteEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(quote: QuoteEntity)
+    suspend fun upsert(quote: QuoteEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(quotes: List<QuoteEntity>)
+
+    @Query("UPDATE quotes SET status = :status WHERE id = :quoteId")
+    suspend fun setStatus(quoteId: String, status: String)
+
+    /** Marks every OTHER quote on this job as NOT_SELECTED once one is chosen. */
+    @Query("UPDATE quotes SET status = :status WHERE jobRequestId = :jobRequestId AND id != :exceptQuoteId")
+    suspend fun setStatusForOthers(jobRequestId: String, exceptQuoteId: String, status: String)
 }
+

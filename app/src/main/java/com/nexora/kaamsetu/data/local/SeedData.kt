@@ -37,15 +37,21 @@ object SeedData {
         ServiceCategoryEntity("car_mechanic", "Vehicle", "Car Mechanic")
     )
 
+    /**
+     * Phase 3: renamed to match the product spec's demo technicians exactly
+     * (Ravi Kumar / Electrician, Mohan Sharma / Plumber, Amit Singh / Mobile+
+     * Computer Repair). Ids kept stable — DEMO_TECHNICIAN_ID ("tech_1") now
+     * resolves to Ravi Kumar, matching the spec's test scenario directly.
+     */
     fun technicians(): List<TechnicianEntity> = listOf(
         TechnicianEntity(
-            id = "tech_1", name = "Ramesh Kumar", phone = "9990000001",
-            status = "APPROVED", skillsCsv = "electrician,fan_repair", city = "Lucknow",
+            id = "tech_1", name = "Ravi Kumar", phone = "9990000001",
+            status = "APPROVED", skillsCsv = "electrician,fan_repair,wiring", city = "Lucknow",
             rating = 4.6, completedJobs = 128, isVerified = true, isAvailable = true
         ),
         TechnicianEntity(
-            id = "tech_2", name = "Suresh Yadav", phone = "9990000002",
-            status = "APPROVED", skillsCsv = "plumber,water_tank_cleaning", city = "Lucknow",
+            id = "tech_2", name = "Mohan Sharma", phone = "9990000002",
+            status = "APPROVED", skillsCsv = "plumber,pipe_repair,bathroom_repair", city = "Lucknow",
             rating = 4.3, completedJobs = 76, isVerified = true, isAvailable = true
         ),
         TechnicianEntity(
@@ -54,7 +60,7 @@ object SeedData {
             rating = 0.0, completedJobs = 0, isVerified = false, isAvailable = false
         ),
         TechnicianEntity(
-            id = "tech_4", name = "Anil Sharma", phone = "9990000004",
+            id = "tech_4", name = "Amit Singh", phone = "9990000004",
             status = "APPROVED", skillsCsv = "mobile_repair,computer_repair", city = "Lucknow",
             rating = 4.8, completedJobs = 210, isVerified = true, isAvailable = true
         )
@@ -105,8 +111,20 @@ object SeedData {
         )
     )
 
+    /** One illustrative pending quote on job_1 (the electrician job), from the one seeded technician actually qualified for it. */
     fun quotes(): List<QuoteEntity> = listOf(
-        QuoteEntity(id = "quote_1", jobRequestId = "job_1", technicianId = "tech_1", price = 350.0, etaMinutes = 40),
-        QuoteEntity(id = "quote_2", jobRequestId = "job_1", technicianId = "tech_4", price = 400.0, etaMinutes = 25)
+        QuoteEntity(
+            id = "quote_1",
+            jobRequestId = "job_1",
+            technicianId = "tech_1",
+            technicianName = "Ravi Kumar",
+            technicianRating = 4.6,
+            technicianVerified = true,
+            estimatedPrice = 350.0,
+            estimatedArrivalTime = "40 minutes",
+            message = "I can fix the wiring issue today.",
+            status = "PENDING",
+            createdAt = System.currentTimeMillis() - 3_000_000L
+        )
     )
 }

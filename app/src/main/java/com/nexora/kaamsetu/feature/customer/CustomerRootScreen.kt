@@ -28,6 +28,7 @@ import com.nexora.kaamsetu.feature.customer.home.CustomerHomeScreen
 import com.nexora.kaamsetu.feature.customer.jobdetails.JobDetailsScreen
 import com.nexora.kaamsetu.feature.customer.jobs.CustomerJobsScreen
 import com.nexora.kaamsetu.feature.customer.profile.CustomerProfileScreen
+import com.nexora.kaamsetu.feature.customer.quotes.CustomerQuotesScreen
 import com.nexora.kaamsetu.feature.customer.services.CustomerServicesScreen
 
 private val tabs = listOf(CustomerTab.Home, CustomerTab.Services, CustomerTab.MyJobs, CustomerTab.Profile)
@@ -135,9 +136,26 @@ fun CustomerRootScreen(onExitRole: (UserRole?) -> Unit) {
                 arguments = listOf(navArgument("jobId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val jobId = backStackEntry.arguments?.getString("jobId").orEmpty()
-                JobDetailsScreen(jobId = jobId)
+                JobDetailsScreen(
+                    jobId = jobId,
+                    onViewQuotes = { id -> navController.navigate(CustomerRoutes.quotes(id)) }
+                )
+            }
+
+            composable(
+                route = CustomerRoutes.QUOTES,
+                arguments = listOf(navArgument("jobId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val jobId = backStackEntry.arguments?.getString("jobId").orEmpty()
+                CustomerQuotesScreen(
+                    jobId = jobId,
+                    onTechnicianSelected = {
+                        // Back to this job's details, now showing the Selected
+                        // Technician card instead of the quote comparison list.
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }
 }
-

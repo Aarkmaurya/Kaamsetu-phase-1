@@ -12,6 +12,7 @@ import com.nexora.kaamsetu.domain.model.JobRequest
 import com.nexora.kaamsetu.domain.model.JobRequestPublicView
 import com.nexora.kaamsetu.domain.model.JobStatus
 import com.nexora.kaamsetu.domain.model.Quote
+import com.nexora.kaamsetu.domain.model.QuoteStatus
 import com.nexora.kaamsetu.domain.model.ServiceCategory
 import com.nexora.kaamsetu.domain.model.ServiceType
 import com.nexora.kaamsetu.domain.model.ServiceTiming
@@ -78,8 +79,8 @@ class MockJobRepository(
     override fun observeAllJobs(): Flow<List<JobRequest>> =
         jobDao.observeAll().map { list -> list.map { it.toDomain() } }
 
-    override fun observeJobById(jobRequestId: String): Flow<JobRequest?> =
-        jobDao.observeById(jobRequestId).map { it?.toDomain() }
+    override fun observeOpenJobPublicViewById(jobRequestId: String): Flow<JobRequestPublicView?> =
+        jobDao.observeById(jobRequestId).map { it?.toDomain()?.publicView() }
 
     override fun observeOpenRequestsPublicView(): Flow<List<JobRequestPublicView>> =
         jobDao.observeOpenRequests().map { list -> list.map { it.toDomain().publicView() } }
@@ -93,12 +94,22 @@ class MockJobRepository(
 
     override suspend fun selectTechnician(jobRequestId: String, technicianId: String) {
         val existing = jobDao.getById(jobRequestId) ?: return
+        // A job can only ever be assigned once — ignore any further attempts,
+        // regardless of what the UI allowed the customer to tap.
+        if (existing.selectedTechnicianId != null) return
+
         jobDao.update(
             existing.copy(
                 selectedTechnicianId = technicianId,
-                status = JobStatus.BOOKING_CONFIRMED.name
+                status = JobStatus.TECHNICIAN_SELECTED.name
             )
         )
+
+        val winningQuote = quoteDao.getByJobAndTechnician(jobRequestId, technicianId)
+        if (winningQuote != null) {
+            quoteDao.setStatus(winningQuote.id, QuoteStatus.SELECTED.name)
+            quoteDao.setStatusForOthers(jobRequestId, winningQuote.id, QuoteStatus.NOT_SELECTED.name)
+        }
     }
 
     override suspend fun updateStatus(jobRequestId: String, status: JobStatus) {
@@ -107,16 +118,28 @@ class MockJobRepository(
     }
 
     override fun observeQuotesForJob(jobRequestId: String): Flow<List<Quote>> =
-        quoteDao.observeForJob(jobRequestId).map { list ->
-            list.map { Quote(it.id, it.jobRequestId, it.technicianId, it.price, it.etaMinutes) }
-        }
+        quoteDao.observeForJob(jobRequestId).map { list -> list.map { it.toDomain() } }
+
+    override suspend fun getMyQuoteForJob(jobRequestId: String, technicianId: String): Quote? =
+        quoteDao.getByJobAndTechnician(jobRequestId, technicianId)?.toDomain()
 
     override suspend fun submitQuote(quote: Quote) {
-        quoteDao.insert(
-            QuoteEntity(quote.id, quote.jobRequestId, quote.technicianId, quote.price, quote.etaMinutes)
-        )
+        // Enforce "one active quote per technician per job" by natural key
+        // (jobRequestId, technicianId) — reuse the existing row's id/createdAt
+        // if this technician has already quoted this job, so this is always
+        // an update-in-place rather than a second row.
+        val existing = quoteDao.getByJobAndTechnician(quote.jobRequestId, quote.technicianId)
+        val toSave = if (existing != null) {
+            quote.copy(id = existing.id, createdAt = existing.createdAt)
+        } else {
+            quote
+        }
+        quoteDao.upsert(toSave.toEntity())
+
         val job = jobDao.getById(quote.jobRequestId)
-        if (job != null && job.status == JobStatus.REQUEST_CREATED.name) {
+        if (job != null &&
+            (job.status == JobStatus.REQUEST_CREATED.name || job.status == JobStatus.FINDING_PROFESSIONALS.name)
+        ) {
             jobDao.update(job.copy(status = JobStatus.QUOTES_RECEIVED.name))
         }
     }
@@ -155,6 +178,34 @@ class MockJobRepository(
         status = status.name,
         createdAt = createdAt,
         selectedTechnicianId = selectedTechnicianId
+    )
+
+    private fun QuoteEntity.toDomain() = Quote(
+        id = id,
+        jobRequestId = jobRequestId,
+        technicianId = technicianId,
+        technicianName = technicianName,
+        technicianRating = technicianRating,
+        technicianVerified = technicianVerified,
+        estimatedPrice = estimatedPrice,
+        estimatedArrivalTime = estimatedArrivalTime,
+        message = message,
+        status = QuoteStatus.valueOf(status),
+        createdAt = createdAt
+    )
+
+    private fun Quote.toEntity() = QuoteEntity(
+        id = id,
+        jobRequestId = jobRequestId,
+        technicianId = technicianId,
+        technicianName = technicianName,
+        technicianRating = technicianRating,
+        technicianVerified = technicianVerified,
+        estimatedPrice = estimatedPrice,
+        estimatedArrivalTime = estimatedArrivalTime,
+        message = message,
+        status = status.name,
+        createdAt = createdAt
     )
 }
 

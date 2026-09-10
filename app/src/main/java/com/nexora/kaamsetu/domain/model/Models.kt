@@ -117,6 +117,7 @@ data class JobRequest(
         approximateArea = approximateArea,
         preferredTime = preferredTime,
         scheduledDateTime = scheduledDateTime,
+        serviceType = serviceType,
         status = status
     )
 }
@@ -129,6 +130,7 @@ data class JobRequestPublicView(
     val approximateArea: String,
     val preferredTime: ServiceTiming,
     val scheduledDateTime: String?,
+    val serviceType: ServiceType,
     val status: JobStatus
 )
 
@@ -149,6 +151,25 @@ data class Quote(
     val id: String,
     val jobRequestId: String,
     val technicianId: String,
-    val price: Double,
-    val etaMinutes: Int
+    /**
+     * Technician name/rating/verified are captured onto the quote at submit
+     * time (denormalized) so the customer's Compare Quotes screen can render
+     * a card without joining against the technician table. Acceptable for
+     * this MVP; a real backend may instead join live technician data.
+     */
+    val technicianName: String,
+    val technicianRating: Double,
+    val technicianVerified: Boolean,
+    val estimatedPrice: Double,
+    val estimatedArrivalTime: String,
+    val message: String? = null,
+    val status: QuoteStatus = QuoteStatus.PENDING,
+    val createdAt: Long
 )
+
+enum class QuoteStatus {
+    PENDING,
+    SELECTED,
+    NOT_SELECTED
+}
+

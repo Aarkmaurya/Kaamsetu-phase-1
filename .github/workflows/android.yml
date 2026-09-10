@@ -24,14 +24,6 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Ensure gradle-wrapper.jar is present and authentic
-        # gradle-wrapper.jar is a binary that isn't safely hand-authored, so we
-        # (re)generate it here from the pinned version in
-        # gradle/wrapper/gradle-wrapper.properties using the runner's system
-        # Gradle. This keeps gradlew/gradlew.bat/gradle-wrapper.properties as
-        # the committed source of truth and guarantees an authentic jar every run.
-        run: gradle wrapper --gradle-version 8.7 --distribution-type bin
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 

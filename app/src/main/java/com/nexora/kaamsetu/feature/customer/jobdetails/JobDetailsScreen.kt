@@ -27,12 +27,16 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun JobDetailsScreen(jobId: String) {
+fun JobDetailsScreen(
+    jobId: String,
+    onViewQuotes: (jobId: String) -> Unit = {}
+) {
     val container = LocalAppContainer.current
     val viewModel: JobDetailsViewModel = viewModel(
         factory = GenericViewModelFactory { JobDetailsViewModel(jobId, container.jobRepository) }
     )
     val job by viewModel.job.collectAsState()
+    val selectedQuote by viewModel.selectedQuote.collectAsState()
 
     Column(
         modifier = Modifier
@@ -67,7 +71,43 @@ fun JobDetailsScreen(jobId: String) {
             DetailRow("Status", current.status.name.replace('_', ' '))
         }
 
-        if (current.status == JobStatus.REQUEST_CREATED) {
+        if (current.status == JobStatus.QUOTES_RECEIVED) {
+            Button(
+                onClick = { onViewQuotes(jobId) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+                    .padding(top = 16.dp)
+            ) {
+                Text("View Quotes")
+            }
+        }
+
+        val quote = selectedQuote
+        if (current.status == JobStatus.TECHNICIAN_SELECTED && quote != null) {
+            InfoCard {
+                Column {
+                    Text(text = "Selected Technician", style = MaterialTheme.typography.titleMedium)
+                    Text(text = quote.technicianName, style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text = "⭐ ${quote.technicianRating}" + if (quote.technicianVerified) " • ✓ Verified Partner" else "",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "Agreed Price: ₹${quote.estimatedPrice.toInt()}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                    Text(
+                        text = "Estimated Arrival: ${quote.estimatedArrivalTime}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
+
+        if (current.status == JobStatus.REQUEST_CREATED || current.status == JobStatus.FINDING_PROFESSIONALS) {
             Button(
                 onClick = viewModel::cancelRequest,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),

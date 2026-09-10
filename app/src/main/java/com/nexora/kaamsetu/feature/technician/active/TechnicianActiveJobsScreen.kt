@@ -21,6 +21,7 @@ import com.nexora.kaamsetu.core.di.LocalAppContainer
 import com.nexora.kaamsetu.core.theme.InfoCard
 import com.nexora.kaamsetu.core.theme.ScreenTitle
 import com.nexora.kaamsetu.domain.model.JobStatus
+import com.nexora.kaamsetu.domain.model.timingDisplay
 
 @Composable
 fun TechnicianActiveJobsScreen() {
@@ -29,6 +30,7 @@ fun TechnicianActiveJobsScreen() {
         factory = GenericViewModelFactory { TechnicianActiveJobsViewModel(container.jobRepository) }
     )
     val activeJobs by viewModel.activeJobs.collectAsState()
+    val selectedQuoteByJobId by viewModel.selectedQuoteByJobId.collectAsState()
 
     LazyColumn(
         modifier = Modifier
@@ -47,6 +49,10 @@ fun TechnicianActiveJobsScreen() {
                 Column {
                     Text(text = job.serviceName, style = MaterialTheme.typography.titleMedium)
                     Text(text = job.problemDescription, style = MaterialTheme.typography.bodyMedium)
+
+                    // Unlocked only because this job's selectedTechnicianId is
+                    // this technician — see JobRequest's class doc and
+                    // JobRepository.observeJobsForSelectedTechnician.
                     Text(
                         text = "Customer: ${job.customerName}",
                         style = MaterialTheme.typography.bodyMedium
@@ -59,6 +65,26 @@ fun TechnicianActiveJobsScreen() {
                         text = "Phone: ${job.customerPhone}",
                         style = MaterialTheme.typography.bodyMedium
                     )
+                    Text(
+                        text = "Approximate Area: ${job.approximateArea}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "Preferred Time: ${job.timingDisplay()}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    selectedQuoteByJobId[job.id]?.let { quote ->
+                        Text(
+                            text = "Agreed Price: ₹${quote.estimatedPrice.toInt()}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+
                     Text(
                         text = "Status: ${job.status.name.replace('_', ' ')}",
                         style = MaterialTheme.typography.labelLarge,
@@ -80,4 +106,3 @@ fun TechnicianActiveJobsScreen() {
         }
     }
 }
-

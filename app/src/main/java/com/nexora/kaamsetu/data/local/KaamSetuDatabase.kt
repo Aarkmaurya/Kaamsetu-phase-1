@@ -13,14 +13,14 @@ import androidx.room.RoomDatabase
         JobRequestEntity::class,
         QuoteEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
-// Version bumped 1 -> 2 for Phase 2's expanded JobRequestEntity (serviceName,
-// scheduledDateTime, serviceType, customerName, createdAt). No Migration class
-// is written because fallbackToDestructiveMigration() is still enabled below —
-// acceptable for this pre-release MVP; a real Migration is required once the
-// app has real users with data worth preserving.
+// Version bumped 2 -> 3 for Phase 3's expanded QuoteEntity (technician name/
+// rating/verified, estimatedPrice, estimatedArrivalTime, message, status).
+// Still relying on fallbackToDestructiveMigration() below, consistent with
+// the migration strategy established in Phase 2 — acceptable for this
+// pre-release MVP; a real Migration is required once real user data exists.
 abstract class KaamSetuDatabase : RoomDatabase() {
 
     abstract fun serviceCategoryDao(): ServiceCategoryDao
@@ -47,4 +47,3 @@ abstract class KaamSetuDatabase : RoomDatabase() {
         }
     }
 }
-

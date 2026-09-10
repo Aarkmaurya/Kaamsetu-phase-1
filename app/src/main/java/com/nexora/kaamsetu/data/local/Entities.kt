@@ -56,12 +56,24 @@ data class JobRequestEntity(
     val selectedTechnicianId: String? = null
 )
 
+/**
+ * Phase 3: expanded to carry technician name/rating/verified (denormalized —
+ * see Quote's class doc), a human-readable arrival estimate, an optional
+ * message, and a quote status (PENDING / SELECTED / NOT_SELECTED). Room
+ * version bumped accordingly in KaamSetuDatabase.
+ */
 @Entity(tableName = "quotes")
 data class QuoteEntity(
     @PrimaryKey val id: String,
     val jobRequestId: String,
     val technicianId: String,
-    val price: Double,
-    val etaMinutes: Int
+    val technicianName: String,
+    val technicianRating: Double,
+    val technicianVerified: Boolean,
+    val estimatedPrice: Double,
+    val estimatedArrivalTime: String,
+    val message: String? = null,
+    val status: String,
+    val createdAt: Long
 )
 

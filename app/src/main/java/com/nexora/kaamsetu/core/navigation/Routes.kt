@@ -41,6 +41,11 @@ object CustomerRoutes {
     private const val JOB_DETAILS_BASE = "customer/job_details"
     const val JOB_DETAILS = "$JOB_DETAILS_BASE/{jobId}"
     fun jobDetails(jobId: String) = "$JOB_DETAILS_BASE/$jobId"
+
+    /** Phase 3: compare-quotes screen, reached from Job Details once quotes exist. */
+    private const val QUOTES_BASE = "customer/quotes"
+    const val QUOTES = "$QUOTES_BASE/{jobId}"
+    fun quotes(jobId: String) = "$QUOTES_BASE/$jobId"
 }
 
 sealed class TechnicianTab(val route: String, val label: String, val icon: ImageVector) {
@@ -48,6 +53,21 @@ sealed class TechnicianTab(val route: String, val label: String, val icon: Image
     object JobRequests : TechnicianTab("technician/job_requests", "Job Requests", Icons.Filled.List)
     object ActiveJobs : TechnicianTab("technician/active_jobs", "Active Jobs", Icons.Filled.Build)
     object Profile : TechnicianTab("technician/profile", "Profile", Icons.Filled.Person)
+}
+
+/**
+ * Phase 3 destinations layered on top of the technician bottom-nav tabs above —
+ * same pattern as CustomerRoutes: live in the technician NavHost, not tabs,
+ * bottom bar hidden while on them (see TechnicianRootScreen).
+ */
+object TechnicianRoutes {
+    private const val JOB_DETAILS_BASE = "technician/job_details"
+    const val JOB_DETAILS = "$JOB_DETAILS_BASE/{jobId}"
+    fun jobDetails(jobId: String) = "$JOB_DETAILS_BASE/$jobId"
+
+    private const val SEND_QUOTE_BASE = "technician/send_quote"
+    const val SEND_QUOTE = "$SEND_QUOTE_BASE/{jobId}"
+    fun sendQuote(jobId: String) = "$SEND_QUOTE_BASE/$jobId"
 }
 
 sealed class AdminTab(val route: String, val label: String, val icon: ImageVector) {

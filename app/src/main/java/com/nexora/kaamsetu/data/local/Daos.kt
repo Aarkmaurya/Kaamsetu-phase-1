@@ -47,6 +47,24 @@ interface CustomerDao {
 }
 
 @Dao
+interface UserAccountDao {
+    @Query("SELECT * FROM user_accounts WHERE phone = :phone")
+    suspend fun findByPhone(phone: String): UserAccountEntity?
+
+    @Query("SELECT * FROM user_accounts WHERE id = :id")
+    suspend fun findById(id: String): UserAccountEntity?
+
+    @Query("SELECT COUNT(*) FROM user_accounts")
+    suspend fun count(): Int
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(account: UserAccountEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(accounts: List<UserAccountEntity>)
+}
+
+@Dao
 interface JobRequestDao {
     @Query("SELECT * FROM job_requests ORDER BY createdAt DESC")
     fun observeAll(): Flow<List<JobRequestEntity>>

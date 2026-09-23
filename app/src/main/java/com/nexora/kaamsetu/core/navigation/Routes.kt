@@ -2,15 +2,12 @@ package com.nexora.kaamsetu.core.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.nexora.kaamsetu.domain.model.UserRole
 
 /** Top-level app destinations, before a role's own bottom-nav graph takes over. */
 object TopLevelRoute {
@@ -18,7 +15,21 @@ object TopLevelRoute {
     const val ROLE_SELECT = "role_select"
     const val CUSTOMER_ROOT = "customer_root"
     const val TECHNICIAN_ROOT = "technician_root"
-    const val ADMIN_ROOT = "admin_root"
+}
+
+/**
+ * Phase 4B.01: Login/Register both take the role chosen on Role Selection as
+ * a navigation argument, so one pair of screens serves both Customer and
+ * Technician — there is no Admin variant and no way to reach one from here.
+ */
+object AuthRoutes {
+    private const val LOGIN_BASE = "auth/login"
+    const val LOGIN = "$LOGIN_BASE/{role}"
+    fun login(role: UserRole) = "$LOGIN_BASE/${role.name}"
+
+    private const val REGISTER_BASE = "auth/register"
+    const val REGISTER = "$REGISTER_BASE/{role}"
+    fun register(role: UserRole) = "$REGISTER_BASE/${role.name}"
 }
 
 sealed class CustomerTab(val route: String, val label: String, val icon: ImageVector) {
@@ -70,10 +81,3 @@ object TechnicianRoutes {
     fun sendQuote(jobId: String) = "$SEND_QUOTE_BASE/$jobId"
 }
 
-sealed class AdminTab(val route: String, val label: String, val icon: ImageVector) {
-    object Dashboard : AdminTab("admin/dashboard", "Dashboard", Icons.Filled.Dashboard)
-    object Technicians : AdminTab("admin/technicians", "Technicians", Icons.Filled.CheckCircle)
-    object Jobs : AdminTab("admin/jobs", "Jobs", Icons.Filled.Work)
-    object Services : AdminTab("admin/services", "Services", Icons.Filled.Place)
-    object Areas : AdminTab("admin/areas", "Areas", Icons.Filled.LocationOn)
-}

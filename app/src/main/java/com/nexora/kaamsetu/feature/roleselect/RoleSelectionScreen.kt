@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,17 +57,6 @@ fun RoleSelectionScreen(onRoleSelected: (UserRole) -> Unit) {
             ) {
                 Text("Technician — काम करना है", style = MaterialTheme.typography.titleMedium)
             }
-
-            OutlinedButton(
-                onClick = { onRoleSelected(UserRole.ADMIN) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .padding(top = 16.dp)
-            ) {
-                Text("Admin", style = MaterialTheme.typography.titleMedium)
-            }
         }
     }
 }
-

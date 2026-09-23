@@ -22,7 +22,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexora.kaamsetu.core.navigation.CustomerRoutes
 import com.nexora.kaamsetu.core.navigation.CustomerTab
-import com.nexora.kaamsetu.domain.model.UserRole
 import com.nexora.kaamsetu.feature.customer.createrequest.CreateServiceRequestScreen
 import com.nexora.kaamsetu.feature.customer.home.CustomerHomeScreen
 import com.nexora.kaamsetu.feature.customer.jobdetails.JobDetailsScreen
@@ -35,7 +34,7 @@ private val tabs = listOf(CustomerTab.Home, CustomerTab.Services, CustomerTab.My
 private val tabRoutes = tabs.map { it.route }.toSet()
 
 @Composable
-fun CustomerRootScreen(onExitRole: (UserRole?) -> Unit) {
+fun CustomerRootScreen(onLogout: () -> Unit) {
     val navController = rememberNavController()
 
     // Simple hoisted UI state shared between screens in this graph — avoids
@@ -110,7 +109,7 @@ fun CustomerRootScreen(onExitRole: (UserRole?) -> Unit) {
             }
 
             composable(CustomerTab.Profile.route) {
-                CustomerProfileScreen(onSwitchRole = onExitRole)
+                CustomerProfileScreen(onLogout = onLogout)
             }
 
             composable(

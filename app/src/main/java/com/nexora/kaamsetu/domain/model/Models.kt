@@ -1,10 +1,13 @@
 package com.nexora.kaamsetu.domain.model
 
-/** The three roles supported by KaamSetu. Kept as an enum so navigation and RBAC checks share one source of truth. */
+/**
+ * The two roles supported by the Android app. Admin is a separate web
+ * dashboard (see the companion React admin project) and is intentionally
+ * not part of this enum — there is no Android entry point into it.
+ */
 enum class UserRole {
     CUSTOMER,
-    TECHNICIAN,
-    ADMIN
+    TECHNICIAN
 }
 
 enum class TechnicianStatus {

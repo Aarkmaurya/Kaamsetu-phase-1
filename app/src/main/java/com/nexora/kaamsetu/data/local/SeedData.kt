@@ -71,6 +71,34 @@ object SeedData {
     )
 
     /**
+     * Phase 4B.01: demo login accounts matching the pre-existing seeded
+     * customer and technician, so Phase 3's data (jobs, quotes, technician
+     * profile) is reachable and testable through the new auth flow without
+     * registering a fresh account first. Password is the same clearly-documented
+     * demo credential shown on the Login screen — not a real secret.
+     */
+    const val DEMO_PASSWORD = "Demo@1234"
+
+    fun userAccounts(): List<UserAccountEntity> = listOf(
+        UserAccountEntity(
+            id = "cust_demo",
+            phone = "9998887770",
+            passwordHash = com.nexora.kaamsetu.core.security.PasswordHasher.hash(DEMO_PASSWORD),
+            name = "Demo Customer",
+            role = "CUSTOMER",
+            createdAt = System.currentTimeMillis()
+        ),
+        UserAccountEntity(
+            id = "tech_1",
+            phone = "9990000001",
+            passwordHash = com.nexora.kaamsetu.core.security.PasswordHasher.hash(DEMO_PASSWORD),
+            name = "Ravi Kumar",
+            role = "TECHNICIAN",
+            createdAt = System.currentTimeMillis()
+        )
+    )
+
+    /**
      * A couple of illustrative jobs so My Jobs / Admin Jobs aren't empty on
      * first launch. Phase 2's real flow is creating NEW requests through the
      * app itself (Home -> Services -> Create Request) — this seed data is not
@@ -128,3 +156,4 @@ object SeedData {
         )
     )
 }
+

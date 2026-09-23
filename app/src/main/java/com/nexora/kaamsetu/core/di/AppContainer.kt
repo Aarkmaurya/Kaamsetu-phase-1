@@ -1,9 +1,12 @@
 package com.nexora.kaamsetu.core.di
 
 import android.content.Context
+import com.nexora.kaamsetu.core.session.SessionManager
 import com.nexora.kaamsetu.data.local.KaamSetuDatabase
 import com.nexora.kaamsetu.data.local.SeedData
+import com.nexora.kaamsetu.data.repository.AuthRepository
 import com.nexora.kaamsetu.data.repository.JobRepository
+import com.nexora.kaamsetu.data.repository.LocalAuthRepository
 import com.nexora.kaamsetu.data.repository.MockJobRepository
 import com.nexora.kaamsetu.data.repository.MockServiceCatalogRepository
 import com.nexora.kaamsetu.data.repository.MockTechnicianRepository
@@ -34,7 +37,11 @@ class AppContainer(context: Context) {
     val jobRepository: JobRepository =
         MockJobRepository(database.jobRequestDao(), database.quoteDao(), database.customerDao())
 
+    val authRepository: AuthRepository =
+        LocalAuthRepository(database.userAccountDao(), database.customerDao(), database.technicianDao())
+
     init {
+        SessionManager.init(context)
         appScope.launch { seedIfNeeded() }
     }
 
@@ -49,6 +56,9 @@ class AppContainer(context: Context) {
         database.technicianDao().insertAll(SeedData.technicians())
         database.jobRequestDao().insertAll(SeedData.jobRequests())
         database.quoteDao().insertAll(SeedData.quotes())
+        if (database.userAccountDao().count() == 0) {
+            database.userAccountDao().insertAll(SeedData.userAccounts())
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 package com.nexora.kaamsetu.data.local
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "service_categories")
@@ -29,6 +30,24 @@ data class CustomerEntity(
     @PrimaryKey val id: String,
     val name: String,
     val phone: String
+)
+
+/**
+ * Phase 4B.01: local demo account store for the auth foundation. `id` is
+ * shared with the matching CustomerEntity/TechnicianEntity row created at
+ * registration time (see LocalAuthRepository.register) so existing
+ * repositories keep working against a real logged-in user's id unchanged.
+ * `passwordHash` is never plain text — see PasswordHasher — but this whole
+ * table is still local-only demo auth, not production security.
+ */
+@Entity(tableName = "user_accounts", indices = [Index(value = ["phone"], unique = true)])
+data class UserAccountEntity(
+    @PrimaryKey val id: String,
+    val phone: String,
+    val passwordHash: String,
+    val name: String,
+    val role: String,
+    val createdAt: Long
 )
 
 /**

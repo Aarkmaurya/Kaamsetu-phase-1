@@ -119,10 +119,7 @@ class MockJobRepository(
 
     override fun observeQuotesForJob(jobRequestId: String): Flow<List<Quote>> =
         quoteDao.observeForJob(jobRequestId).map { list -> list.map { it.toDomain() } }
-        
-override fun observeJobById(jobRequestId: String): Flow<JobRequest?> =
-    jobDao.observeById(jobRequestId).map { it?.toDomain() }
-    
+
     override suspend fun getMyQuoteForJob(jobRequestId: String, technicianId: String): Quote? =
         quoteDao.getByJobAndTechnician(jobRequestId, technicianId)?.toDomain()
 
@@ -211,3 +208,4 @@ override fun observeJobById(jobRequestId: String): Flow<JobRequest?> =
         createdAt = createdAt
     )
 }
+

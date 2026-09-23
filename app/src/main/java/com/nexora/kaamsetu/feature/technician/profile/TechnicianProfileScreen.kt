@@ -7,14 +7,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nexora.kaamsetu.core.di.GenericViewModelFactory
+import com.nexora.kaamsetu.core.di.LocalAppContainer
 import com.nexora.kaamsetu.core.theme.InfoCard
 import com.nexora.kaamsetu.core.theme.ScreenTitle
-import com.nexora.kaamsetu.domain.model.UserRole
 
 @Composable
-fun TechnicianProfileScreen(onSwitchRole: (UserRole?) -> Unit) {
+fun TechnicianProfileScreen(onLogout: () -> Unit) {
+    val container = LocalAppContainer.current
+    val viewModel: TechnicianProfileViewModel = viewModel(
+        factory = GenericViewModelFactory { TechnicianProfileViewModel(container.authRepository) }
+    )
+    val currentUser by viewModel.currentUser.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -23,17 +33,18 @@ fun TechnicianProfileScreen(onSwitchRole: (UserRole?) -> Unit) {
         ScreenTitle(title = "Profile")
 
         InfoCard {
-            Text(text = "Ramesh Kumar", style = MaterialTheme.typography.titleMedium)
-            Text(text = "Electrician, Fan Repair", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Lucknow", style = MaterialTheme.typography.bodyMedium)
+            Text(text = currentUser?.name ?: "—", style = MaterialTheme.typography.titleMedium)
+            Text(text = currentUser?.phone ?: "", style = MaterialTheme.typography.bodyMedium)
         }
 
         OutlinedButton(
-            onClick = { onSwitchRole(null) },
+            onClick = {
+                viewModel.logout()
+                onLogout()
+            },
             modifier = Modifier.padding(top = 16.dp)
         ) {
-            Text("Switch role")
+            Text("Log out")
         }
     }
 }
-

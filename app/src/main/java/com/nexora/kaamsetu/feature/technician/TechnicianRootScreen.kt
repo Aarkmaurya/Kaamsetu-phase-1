@@ -19,7 +19,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexora.kaamsetu.core.navigation.TechnicianRoutes
 import com.nexora.kaamsetu.core.navigation.TechnicianTab
-import com.nexora.kaamsetu.domain.model.UserRole
 import com.nexora.kaamsetu.feature.technician.active.TechnicianActiveJobsScreen
 import com.nexora.kaamsetu.feature.technician.home.TechnicianHomeScreen
 import com.nexora.kaamsetu.feature.technician.jobdetails.TechnicianJobDetailsScreen
@@ -36,7 +35,7 @@ private val tabs = listOf(
 private val tabRoutes = tabs.map { it.route }.toSet()
 
 @Composable
-fun TechnicianRootScreen(onExitRole: (UserRole?) -> Unit) {
+fun TechnicianRootScreen(onLogout: () -> Unit) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -87,7 +86,7 @@ fun TechnicianRootScreen(onExitRole: (UserRole?) -> Unit) {
             composable(TechnicianTab.ActiveJobs.route) { TechnicianActiveJobsScreen() }
 
             composable(TechnicianTab.Profile.route) {
-                TechnicianProfileScreen(onSwitchRole = onExitRole)
+                TechnicianProfileScreen(onLogout = onLogout)
             }
 
             composable(

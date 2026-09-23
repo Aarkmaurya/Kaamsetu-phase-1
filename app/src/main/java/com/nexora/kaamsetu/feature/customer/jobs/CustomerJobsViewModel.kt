@@ -2,6 +2,7 @@ package com.nexora.kaamsetu.feature.customer.jobs
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nexora.kaamsetu.core.session.SessionManager
 import com.nexora.kaamsetu.data.repository.JobRepository
 import com.nexora.kaamsetu.domain.model.JobRequest
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,8 +10,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/** Demo customer id — replaced by the real logged-in user id once real auth exists. */
-const val DEMO_CUSTOMER_ID = "cust_demo"
+/**
+ * The current customer id. Phase 4B.01: now sourced from the active login
+ * session instead of a hardcoded value, falling back to the Phase 1-3 seeded
+ * demo customer only if somehow no session is active.
+ */
+val DEMO_CUSTOMER_ID: String
+    get() = SessionManager.currentUserId ?: "cust_demo"
 
 class CustomerJobsViewModel(
     private val jobRepository: JobRepository

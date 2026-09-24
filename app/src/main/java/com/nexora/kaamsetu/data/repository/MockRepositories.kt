@@ -79,6 +79,9 @@ class MockJobRepository(
     override fun observeAllJobs(): Flow<List<JobRequest>> =
         jobDao.observeAll().map { list -> list.map { it.toDomain() } }
 
+    override fun observeJobById(jobRequestId: String): Flow<JobRequest?> =
+        jobDao.observeById(jobRequestId).map { it?.toDomain() }
+        
     override fun observeOpenJobPublicViewById(jobRequestId: String): Flow<JobRequestPublicView?> =
         jobDao.observeById(jobRequestId).map { it?.toDomain()?.publicView() }
 
@@ -208,4 +211,3 @@ class MockJobRepository(
         createdAt = createdAt
     )
 }
-
